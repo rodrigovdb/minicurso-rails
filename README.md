@@ -34,7 +34,11 @@ Vamos então criar um novo projeto Ruby on Rails utilizando o utilitário de lin
 $ rails new agenda
 ```
 
-e então o próprio Rails se encarrega da criação de toda a estrutura de diretórios, além de instalar todas as dependências necessárias para o nosso projeto. Vejamos alguns arquivos:
+e então o próprio Rails se encarrega da criação de toda a estrutura de diretórios, além de instalar todas as dependências necessárias para o nosso projeto. Pronto, já temos um projeto Ruby on Rails :-)
+
+## Configurações iniciais
+
+Após a geração da estrutura do projeto, precisamos fazer algumas pequenas configurações. Vejamos alguns arquivos que vamos alterar:
 
 **Gemfile**
 
