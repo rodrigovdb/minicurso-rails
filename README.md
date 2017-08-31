@@ -37,10 +37,10 @@ $ rails new agenda
 e então o próprio Rails se encarrega da criação de toda a estrutura de diretórios, além de instalar todas as dependências necessárias para o nosso projeto. Vejamos alguns arquivos:
 
 **Gemfile**
-Este é o arquivo em que declaramos as dependências do nosso projeto e sua respectiva versão. Por padrão, utilizamos o `sqlite` como SGBD. Vamos utilizar o `mysql`, portanto precisamos alterar o arquivo. Vamos então adicionar a gem do mysql ao nosso arquivo `Gemfile`:
+Este é o arquivo em que declaramos as dependências do nosso projeto e sua respectiva versão. Vamos adicionar uma nova dependência neste arquivo, descomentando a seguinte linha:
 
 ```ruby
-gem 'mysql2'
+gem 'therubyracer', platforms: :ruby
 ```
 
 Então vamos atualizar as dependências do projeto rodando o comando
@@ -50,6 +50,4 @@ $ bundle install
 ```
 
 **config/database.yml**
-Neste arquivo definimos a configuração do nosso banco de dados. São definidas as configurações para 3 ambientes, sendo eles 
-
-obs: falar do gemfile e da estrutura de diretórios
+Neste arquivo definimos a configuração do nosso banco de dados. São definidas as configurações para 3 ambientes, sendo eles: development, test e production. Aqui é definido o adaptador do banco de dados (no nosso caso o sqlite, mas poderia ser mysql, postgresql etc.), hostname, username, password e nome do banco de dados.
