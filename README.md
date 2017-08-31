@@ -34,6 +34,22 @@ Vamos então criar um novo projeto Ruby on Rails utilizando o utilitário de lin
 $ rails new agenda
 ```
 
-e então o próprio Rails se encarrega da criação de toda a estrutura de diretórios, além de instalar todas as dependências necessárias para o nosso projeto.
+e então o próprio Rails se encarrega da criação de toda a estrutura de diretórios, além de instalar todas as dependências necessárias para o nosso projeto. Vejamos alguns arquivos:
+
+**Gemfile**
+Este é o arquivo em que declaramos as dependências do nosso projeto e sua respectiva versão. Por padrão, utilizamos o `sqlite` como SGBD. Vamos utilizar o `mysql`, portanto precisamos alterar o arquivo. Vamos então adicionar a gem do mysql ao nosso arquivo `Gemfile`:
+
+```ruby
+gem 'mysql2'
+```
+
+Então vamos atualizar as dependências do projeto rodando o comando
+
+```
+$ bundle install
+```
+
+**config/database.yml**
+Neste arquivo definimos a configuração do nosso banco de dados. São definidas as configurações para 3 ambientes, sendo eles 
 
 obs: falar do gemfile e da estrutura de diretórios
