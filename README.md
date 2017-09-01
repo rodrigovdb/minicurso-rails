@@ -76,10 +76,10 @@ development:
   database  : agenda_development
 
 test:
-  adapter : sqlite3
-  pool    : 5
-  timeout : 5000
-  database: db/test.sqlite3
+  adapter   : sqlite3
+  pool      : 5
+  timeout   : 5000
+  database  : db/test.sqlite3
 
 production:
   adapter   : mysql2
@@ -99,3 +99,68 @@ Vamos então pedir ao Rails para criar o banco de dados com o comando
 ```
 $ rake db:create
 ```
+
+e pronto. Foram criados os bancos de dados para desenvolvimento e para testes.
+
+# Hello, Rails
+
+O Rails é um framework MVC. As requisições HTTP chegam ao Controller, que por sua vez se comunica com o Model, renderiza uma View e devolve para o usuário. Vamos então criar um controller Welcome, este com uma action Index.
+
+**Importante!!!**
+
+* Utilizamos nomenclatura em inglês, sempre!
+* O nome dos Controllers e dos Models sempre no singular
+
+```
+$ rails generate controller Welcome index
+```
+
+E neste momento o Rails criará diversos arquivos e rotas para nós. Os mais importantes são, é claro, o controller, localizado em `app/controllers/welcome_controller.rb` e a view, localizada em `app/views/welcome/index.html.erb`.
+
+Vamos alterar o arquivo `app/views/welcome/index.html.erb` com o seguinte conteúdo:
+
+```html
+<h1>Hello, Rails!</h1>
+```
+
+Pronto! Temos então nosso Hello, Rails! Para testar, precisamos levantar o servidor web que já vem junto com o Rails. No terminal, execute:
+
+```
+$ rails server
+```
+
+Então acesse no navegador a URL `http://localhost:3000/welcome/index`
+
+# Controllers, Actions e Views
+
+Analisando o fluxo do que está acontecendo, a requisição HTTP bate no nosso servidor (rails server), que direciona para o controller/action correspondente. O resultado desta action normalmente é uma view HTML com ERB.
+
+No caso da url `http://localhost:3000/welcome/index`, estamos acessando  o controller Welcome e a action Index. Ou seja: o controller `app/conrtollers/welcome_controller.rb` possui uma action `index` responsável por fazer todas as operações que desejamos, após isso o resultado é (por padrão) uma view HTML com ERB. **Tudo que nós definimos nesta action estará disponível para utilizar na view**. Vamos então definir uma variável na action. Abra o arquivo `app/controllers/welcome_controller.rb` e altere conforme a seguir:
+
+```ruby
+class WelcomeController < ApplicationController
+  def index
+    @name = params[:name]
+  end
+end
+```
+
+Dentro da action `index`, definimos uma variável `@name`, contendo o valor recebido como parâmetro `name`.
+
+Agora, uma vez definida a variável `@name` na action, vamos utilizá-la na nossa view. Abra o arquivo `app/views/welcome/index.html.erb` e altere conforme a seguir:
+
+```ruby
+<h1>Hello, Rails</h1>
+
+<% if @name -%>
+  <h2>Bem vindo, <%= @name %></h2>
+<% end %>
+```
+
+Adicionamos um condicional `if`, verificando se a variável @name possui valor. Caso não possua, ignoramos o bloco. Porém, caso possua, exibimos a mensagem de bem vindo.
+
+Para testar, vamos acessar novamente a URL `http://localhost:3000/welcome/index`. Como esperado, nada diferente aconteceu, afinal não temos o parâmetro `name`. Vamos passar este parâmetro então, ficando a URL como
+
+`http://localhost:3000/welcome/index?name=rodrigo`
+
+# Scaffolding
