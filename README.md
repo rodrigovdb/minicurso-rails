@@ -267,9 +267,13 @@ Foi criado mais um controller para nossa aplicação, com diversas actions. Vamo
 Criadas todas dentro de `app/views/people/`, as views correspondem às respectivas actions do controller. Algumas actions não possuem views (como `create`, `update` e `destroy`), pois após executar a sua ação redirecionam para outra action. Outras views possuem um "underline" no início do nome. Algumas views possuem a extensão .html.erb e outras .json.jbuilder. Vamos tratar aqui alguns casos.
 
 **_form.html.erb**: Uma _partial_ para exibir o formulário de cadastrar pessoas.
+
 **edit.html.erb**: View para exibir o form de alteração de pessoas. Utiliza a partial `_form`.
+
 **index.html.erb**: View para listar todas as pessoas.
+
 **new.html.erb**: View para exibir o form de criação de nova pessoa. Utiliza a partial `_form`.
+
 **show.html..erb**: View para exibir todas as informações de uma pessoa.
 
 ## Helper
