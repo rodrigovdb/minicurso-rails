@@ -1,0 +1,21 @@
+development:
+  adapter   : mysql2
+  encoding  : utf8
+  username  : desenv
+  password  : rapadura
+  host      : localhost
+  database  : agenda_development
+
+test:
+  adapter 	: sqlite3
+  pool    	: 5
+  timeout 	: 5000
+  database	: db/test.sqlite3
+
+production:
+  adapter   : mysql2
+  encoding  : utf8
+  username  : desenv
+  password  : rapadura
+  host      : localhost
+  database  : agenda_production
