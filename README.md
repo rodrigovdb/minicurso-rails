@@ -133,6 +133,8 @@ $ rails server
 
 Então acesse no navegador a URL `http://localhost:3000/welcome/index`
 
+Para interromper o server, pressione Ctrl + C.
+
 # Controllers, Actions e Views
 
 Analisando o fluxo do que está acontecendo, a requisição HTTP bate no nosso servidor (rails server), que direciona para o controller/action correspondente. O resultado desta action normalmente é uma view HTML com ERB.
@@ -310,4 +312,18 @@ E então vamos alterar a view `app/views/people/show.html.erb` conforme a seguir
 <%= date_to_br(@person.birth_date) %>
 
 [...]
+```
+
+## Testando a aplicação
+
+Finalmente vamos acessar o que fizemos até agora. Rode o comando
+
+```
+$ rails server
+```
+
+e então abra no navegador a URL
+
+```
+http://localhost:3000/people
 ```
