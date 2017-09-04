@@ -47,13 +47,13 @@ Este é o arquivo em que declaramos as dependências do nosso projeto e sua resp
 ```ruby
 # Gemfile
 
-[...]
+...
 gem 'sqlite3'
 gem 'mysql2'
-[...]
+...
 
 gem 'therubyracer', platforms: :ruby
-[...]
+...
 ```
 
 Então vamos atualizar as dependências do projeto rodando o comando
@@ -297,21 +297,21 @@ end
 Agora vamos utilizar este método em 2 lugares: Na view das actions `index` e `show`. Primeiro vamos alterar a view `app/views/people/index.html.erb`, alterando a linha que exibe o nascimento da pessoa, conforme a seguir:
 
 ```
-[...]
+...
 
 <td><%= date_to_br(person.birth_date) %></td>
 
-[...]
+...
 ```
 
 E então vamos alterar a view `app/views/people/show.html.erb` conforme a seguir:
 
 ```
-[...]
+...
 
 <%= date_to_br(@person.birth_date) %>
 
-[...]
+...
 ```
 
 ## Testando a aplicação
@@ -326,4 +326,160 @@ e então abra no navegador a URL
 
 ```
 http://localhost:3000/people
+```
+
+# Adicionando um segundo model
+
+Inicialmente criamos um model com pessoas, contendo o nome, data de nascimento, telefone e email. E se a pessoa tiver mais de um telefone? Vamos lidar com isso criando um novo model, responsável por armazenar todos os telefones de uma pessoa.
+
+## Migration / Model
+
+Vamos utilizar o generator mais uma vez, desta vez para gerar apenas o model, conforme a seguir:
+
+```
+$ rails generate model Phone number:string person:references
+```
+
+Este comando gerará alguns arquivos. Vamos dar uma olhada primeiramente no `app/models/phone.rb`. A principal diferença do model Person é a definição `belongs_to :person`, que configura uma associação no Active Record. A palavra-chave `references` utilizada na linha de comando do generator determina um tipo de dado especial para Models. Ela cria uma nova coluna na tabela do banco de dados. O nome do model informado é acressido pelo sufixo **_id** e é tratado como um valor do tipo integer. Vamos então dar uma olhada na migration criada, em `db/migrate/20170901183624_create_phones.rb`
+
+A definição de `t.references` cria uma coluna do tipo Integer chamada `person_id`, um índice para esta coluna, e também uma constraint do tipo foreign_key que aponta para a coluna `id` da tabela `people`.
+
+Também precisamos uma migration para remover a coluna `phone` da tabela people. Novamente vamos utilizar o generator conforme a seguir:
+
+```
+$ rails generate migration RemovePhoneFromPeople
+```
+e adicionar ao arquivo criado `db/migrate/20170901201828_remove_phone_from_people.rb` o seguinte conteúdo:
+
+```ruby
+class RemovePhoneFromPeople < ActiveRecord::Migration[5.1]
+  def change
+    remove_column :people, :phone, :string
+  end
+end
+```
+
+Vamos agora rodar as migrations com a linha
+
+```
+$ rake db:migrate
+```
+
+O Rails é inteligente o suficiente para executar apenas as migrations que ainda não foram executadas no banco de dados atual. Então o output desta migration deverá ser apenas algo como
+
+```
+== CreatePhones: migrating =====================================
+-- create_table(:phones)
+  -> 0.0980s
+== CreatePhones: migrated (0.0982s) ============================
+
+```
+
+## Associando os Models
+
+As associações do Active Record permitem facilmente declarar os relacionamentos entre dois models. No caso de Pessoas (Person) e Telefones (Phone) podemos dizer que:
+
+1. Cada telefone pertence _(belongs to)_ à uma pessoa.
+2. Cada pessoa pode ter diversos _(has many)_ telefones.
+
+Vamos transcrever isso para nossos models. O model Phone já possui esta definição, conforme a seguir:
+
+```ruby
+# app/models/phone.rb
+
+class Phone < ApplicationRecord
+  belongs_to :person
+
+  validates :number, presence: true
+end
+```
+
+onde `belongs_to :person`, traduzindo literalmente do inglês, significa "pertence a uma pessoa". Vamos definir a relação no model Person.
+
+```ruby
+# app/models/person.rb
+
+class Person < ApplicationRecord
+  has_many :phones
+
+  validates :name, presence: true,
+                   uniqueness: true,
+                   length: { minimum: 5, maximum: 255 }
+end
+```
+
+onde `has_many :phones`, traduzindo literalmente do inglês, significa "possui muitos phones".
+
+## Adicionando uma Rota para os telefones
+
+Como não utilizamos o scaffolding generator aqui, precisamos ensinar para nossa aplicação sobre as rotas relacionadas aos telefones. Vamos então alterar o arquivo `config/routes.rb`
+
+```ruby
+# config/routes.rb
+
+Rails.application.routes.draw do
+  resources :people do
+    resources :phones
+  end
+
+  ...
+```
+
+## Gerando o Controller
+
+Vamos gerar o controller para gerenciar os telefones da pessoa:
+
+```
+$ rails generate controller Phones
+```
+
+e então vamos criar a action responsável por adicionar telefones à pessoa
+
+```ruby
+# app/controllers/phones_controller.rb
+
+class PhonesController < ApplicationController
+	def create
+    @person = Person.find(params[:person_id])
+    @phone	= @person.phones.create(phone_params)
+    redirect_to person_path(@person)
+  end
+
+  private
+    def comment_params
+      params.require(:phone).permit(:number)
+    end
+```
+
+## Ajeitando as views
+
+Após a modificação no banco de dados, algumas views precisam também de alguns ajustes. Vamos por cada uma delas então.
+
+### People#index
+
+No arquivo `app/views/people/index.html.erb` vamos apenas remover a coluna _phone_  da tabela. Removeremos a <th> e a <td> referentes à essa coluna.
+
+### People#_form
+
+Neste arquivo apenas vamos remover a <div> com as informações do telefone.
+
+### People#show
+
+Este será o arquivo com maiores modificações. Primeiramente vamos remover as informações do `:phone`, removendo completamente o <p> referente à esta coluna. Este passo é necessário porque a coluna :phone não existe mais na tabela `people`.
+
+Uma vez removida a informação vamos adicionar um _loop_ que exibirá todos os telefones da pessoa em uma <ul> e também um formulário para adicionar um novo telefone, que enviará os dados para o novo controller criado neste capítulo.
+
+### Application.js
+
+Vamos alterar o arquivo `app/assets/javascripts/application.js` e remover a linha do turbolinks. Algumas funcionalidades Javascript não funcionam bem quando o turbolinks está na aplicação, como o `toggleForm()` anterior.
+
+### Ajeitando o controller de Pessoas
+
+No arquivo `app/controllers/people_controller.rb` vamos apenas remover o `:phone` dos parâmetros permitidos. Vamos alterar o método `person_params`, deixando assim:
+
+```ruby
+# Never trust parameters from the scary internet, only allow the white list through.
+def person_params
+  params.require(:person).permit(:name, :birth_date, :email)
+end
 ```

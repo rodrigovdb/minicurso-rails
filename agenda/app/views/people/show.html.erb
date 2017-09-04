@@ -15,10 +15,43 @@
   <%= @person.email %>
 </p>
 
-<p>
-  <strong>Phone:</strong>
-  <%= @person.phone %>
-</p>
+<h2>Phones</h2>
+
+<ul>
+  <% @person.phones.each do |phone| %>
+    <li><%= phone.number %></li>
+  <% end %>
+</ul>
+
+<a href="#" onclick="toggleForm()">
+  [+] Add phone
+</a>
+
+<script type="text/javascript">
+  function toggleForm(){
+    obj = document.getElementById('phone_form');
+    if(obj.style.display == 'none'){
+      obj.style.display = 'block';
+    } else {
+      obj.style.display = 'none';
+    }
+  }
+</script>
+
+<fieldset id="phone_form" style="display: none">
+  <legend>Add new phone</legend>
+
+  <%= form_for([@person, @person.phones.build]) do |f| %>
+    <div class="field">
+      <%= f.label :number %>
+      <%= f.text_field :number %>
+    </div>
+
+    <div class="actions">
+      <%= f.submit %>
+    </div>
+  <% end %>
+</fieldset>
 
 <%= link_to 'Edit', edit_person_path(@person) %> |
 <%= link_to 'Back', people_path %>
