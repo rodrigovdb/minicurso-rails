@@ -7,7 +7,11 @@ class PhonesController < ApplicationController
   end
 
   def destroy
-    @phone = Phone.find(params[:id])
+    @person = Person.find(params[:person_id])
+    @phone  = @person.phones.find(params[:id])
+    @phone.destroy
+
+    redirect_to person_path(@person)
   end
  
   private

@@ -442,13 +442,15 @@ class PhonesController < ApplicationController
 	def create
     @person = Person.find(params[:person_id])
     @phone	= @person.phones.create(phone_params)
+
     redirect_to person_path(@person)
   end
 
   private
-    def comment_params
+    def phone_params
       params.require(:phone).permit(:number)
     end
+end
 ```
 
 ## Ajeitando as views
@@ -465,9 +467,79 @@ Neste arquivo apenas vamos remover a <div> com as informações do telefone.
 
 ### People#show
 
-Este será o arquivo com maiores modificações. Primeiramente vamos remover as informações do `:phone`, removendo completamente o <p> referente à esta coluna. Este passo é necessário porque a coluna :phone não existe mais na tabela `people`.
+Este será o arquivo com maiores modificações. Vamos executar vários passos neste arquivo, sendo eles:
 
-Uma vez removida a informação vamos adicionar um _loop_ que exibirá todos os telefones da pessoa em uma <ul> e também um formulário para adicionar um novo telefone, que enviará os dados para o novo controller criado neste capítulo.
+1. Remover as informações do atributo `:phone`. A classe `Person`, que se refere à tabela `people`, não possui mais esta coluna.
+2. Adicionar informações do relacionamento `Person.phones` em um _loop_
+3. Criar um form para adicionar novos telefones
+4. Adicionar um link para excluir telefones
+5. Adicionar um JavaScript para ocultar / exibir o formulário para cadastrar novo telefone.
+
+Após estas modificações, o arquivo ficará assim:
+
+```html
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @person.name %>
+</p>
+
+<p>
+  <strong>Birth date:</strong>
+  <%= date_to_br(@person.birth_date) %>
+</p>
+
+<p>
+  <strong>Email:</strong>
+  <%= @person.email %>
+</p>
+
+<h2>Phones</h2>
+
+<ul>
+  <% @person.phones.each do |phone| %>
+    <li>
+      <%= link_to '[x]',  person_phone_path(@person, phone), data: { confirm: 'Are you sure?' }, method: :delete %>
+      <%= phone.number %>
+    </li>
+  <% end %>
+</ul>
+
+<a href="#" onclick="toggleForm()">
+  [+] Add phone
+</a>
+
+<fieldset id="phone_form" style="display: none">
+  <legend>Add new phone</legend>
+
+  <%= form_for([@person, @person.phones.build]) do |f| %>
+    <div class="field">
+      <%= f.label :number %>
+      <%= f.text_field :number %>
+    </div>
+
+    <div class="actions">
+      <%= f.submit %>
+    </div>
+  <% end %>
+</fieldset>
+
+<%= link_to 'Edit', edit_person_path(@person) %> |
+<%= link_to 'Back', people_path %>
+
+<script type="text/javascript">
+  function toggleForm(){
+    obj = document.getElementById('phone_form');
+    if(obj.style.display == 'none'){
+      obj.style.display = 'block';
+    } else {
+      obj.style.display = 'none';
+    }
+  }
+</script>
+```
+
 
 ### Application.js
 
@@ -483,3 +555,12 @@ def person_params
   params.require(:person).permit(:name, :birth_date, :email)
 end
 ```
+
+# Próximos passos
+
+Algumas sugestões:
+
+* Na listagem de pessoas, exibir os telefones na tabela. Veja Eager Loading e a gem `bullet`
+* Na visualização da pessoa, mover o javascript para o arquivo `app/assets/javascripts/people.coffee`, veja sobre CoffeeScript.
+* Na visualização da pessoa, fazer o cadastro e exclusão de telefones utilizando ajax.
+* Adicionar uma máscara para o campo telefone
