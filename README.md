@@ -439,9 +439,17 @@ e então vamos criar a action responsável por adicionar telefones à pessoa
 # app/controllers/phones_controller.rb
 
 class PhonesController < ApplicationController
-	def create
+  def create
     @person = Person.find(params[:person_id])
     @phone	= @person.phones.create(phone_params)
+
+    redirect_to person_path(@person)
+  end
+
+  def destroy
+    @person = Person.find(params[:person_id])
+    @phone  = @person.phones.find(params[:id])
+    @phone.destroy
 
     redirect_to person_path(@person)
   end
