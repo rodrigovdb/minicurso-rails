@@ -459,11 +459,11 @@ Após a modificação no banco de dados, algumas views precisam também de algun
 
 ### People#index
 
-No arquivo `app/views/people/index.html.erb` vamos apenas remover a coluna _phone_  da tabela. Removeremos a <th> e a <td> referentes à essa coluna.
+No arquivo `app/views/people/index.html.erb` vamos apenas remover a coluna _phone_  da tabela. Removeremos a `<th>` e a `<td>` referentes à essa coluna.
 
 ### People#_form
 
-Neste arquivo apenas vamos remover a <div> com as informações do telefone.
+Neste arquivo apenas vamos remover a `<div>` com as informações do telefone.
 
 ### People#show
 
